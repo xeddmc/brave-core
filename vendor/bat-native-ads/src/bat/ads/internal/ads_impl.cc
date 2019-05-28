@@ -179,7 +179,7 @@ void AdsImpl::InitializeUserModel(
   BLOG(INFO) << "Initializing \"" << locale << "\" user model";
 
   user_model_.reset(usermodel::UserModel::CreateInstance());
-  user_model_->InitializePageClassifier(json);
+  user_model_->InitializePageClassifier(json, locale);
 
   BLOG(INFO) << "Initialized \"" << locale << "\" user model";
 }
@@ -469,7 +469,7 @@ std::string AdsImpl::GetWinnerOverTimeCategory() {
 
 std::string AdsImpl::GetWinningCategory(
     const std::vector<double>& page_score) {
-  return user_model_->WinningCategory(page_score);
+  return user_model_->GetWinningCategory(page_score);
 }
 
 std::string AdsImpl::GetWinningCategory(const std::string& html) {

@@ -33,6 +33,7 @@ bool Ads::IsSupportedRegion(const std::string& locale) {
     "GB",  // United Kingdom (Great Britain and Northern Ireland)
     "DE",  // Germany
     "FR",  // France
+    "JP",  // Japan
     "AU",  // Australia
     "NZ",  // New Zealand
     "IE"   // Ireland
