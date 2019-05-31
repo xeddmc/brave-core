@@ -28,6 +28,7 @@ declare namespace Rewards {
 
   export interface State {
     adsData: AdsData
+    adsHistory: AdsHistoryData[]
     autoContributeList: Publisher[]
     balance: Balance
     contributeLoad: boolean
@@ -237,25 +238,27 @@ declare namespace Rewards {
 
   export interface AdsHistoryData {
     [key: string]: any
-    id: number
+    id: string
     date: string
     adDetailRows: AdHistoryDetail[]
   }
 
   export interface AdHistoryDetail {
-    id: number
+    id: string
     adContent: AdContent
     categoryContent: CategoryContent
   }
 
   export interface AdContent {
+    uuid: string
+    creativeSetId: string
     brand: string
     brandInfo: string
     brandLogo: string
     brandDisplayUrl: string
     brandUrl: string
     likeAction: number
-    adAction: 'Viewed' | 'Clicked' | 'Closed' | 'Landed'
+    adAction: 'view' | 'click' | 'dismiss' | 'landed'
     savedAd: boolean
     flaggedAd: boolean
     onThumbUpPress?: () => void
@@ -269,5 +272,25 @@ declare namespace Rewards {
     optAction: number
     onOptInAction?: () => void
     onOptOutAction?: () => void
+  }
+
+  export interface ToggleSaveAd {
+    uuid: string
+    saved: boolean
+  }
+
+  export interface ToggleFlagAd {
+    uuid: string
+    flagged: boolean
+  }
+
+  export interface ToggleOptAction {
+    category: string
+    action: number
+  }
+
+  export interface ToggleLikeAction {
+    uuid: string
+    action: number
   }
 }
