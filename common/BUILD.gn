@@ -21,14 +21,23 @@ source_set("pref_names") {
   ]
 }
 
+source_set("switches") {
+  sources = [
+    "brave_switches.cc",
+    "brave_switches.h",
+  ]
+
+  deps = [
+    "//base",
+  ]
+}
+
 source_set("common") {
   sources = [
     "brave_content_client.cc",
     "brave_content_client.h",
     "brave_paths.cc",
     "brave_paths.h",
-    "brave_switches.cc",
-    "brave_switches.h",
     "common_message_generator.cc",
     "common_message_generator.h",
     "importer/brave_referral.cc",
@@ -78,6 +87,7 @@ source_set("common") {
     ":brave_cookie_blocking",
     ":pref_names",
     ":shield_exceptions",
+    ":switches",
     "//brave/chromium_src:common",
     "//content/public/common",
   ]
