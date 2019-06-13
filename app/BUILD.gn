@@ -32,4 +32,13 @@ grit("brave_generated_resources_grit") {
   resource_ids = "//brave/browser/resources/resource_ids"
 }
 
-group("app") {}
+group("app") {
+  copy("dmg-background.png") {
+    sources = [
+      "theme/brave/mac/dmg-background.png"
+    ]
+    outputs = [
+      "$root_out_dir/dmg-background.png"
+    ]
+  }
+}
