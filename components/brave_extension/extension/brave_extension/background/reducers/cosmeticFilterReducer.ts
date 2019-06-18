@@ -30,7 +30,6 @@ import { getOrigin } from '../../helpers/urlUtils'
 
 // export const debounce = function<T>(fn: (data: T) => void, bufferInterval: number, ...args: Array<any>) {
 const applyDOMCosmeticFilterDebounce = debounce((data: any) => {
-  // chrome.send('brave_adblock.updateCustomFilters', [customFilters])
   applyDOMCosmeticFilters(data.tabData, data.tabId)
 }, 1000 / 60) // 60 fps
 
@@ -74,6 +73,7 @@ export default function cosmeticFilterReducer (state: State = {
       // if it is, call applyCOMCosmeticFilterDebounce
       // updateCustomFilters(state.settings.customFilters)
 
+      applyCSSCosmeticFilters(tabData, action.tabId)
       chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
         let notToBeApplied: Boolean
         // !storeData.cosmeticFilterList || storeData.cosmeticFilterList.length === 0 // if it doesn't exist, don't apply mutation observer
@@ -100,7 +100,6 @@ export default function cosmeticFilterReducer (state: State = {
         }
       })
       console.log('applying CSS filters')
-      applyCSSCosmeticFilters(tabData, action.tabId)
       break
     }
     case windowTypes.WINDOW_REMOVED: {
