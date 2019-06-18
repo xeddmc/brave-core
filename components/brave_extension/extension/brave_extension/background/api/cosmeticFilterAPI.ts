@@ -1,3 +1,9 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+* License, v. 2.0. If a copy of the MPL was not distributed with this file,
+* You can obtain one at http://mozilla.org/MPL/2.0/. */
+import { Tab } from '../../types/state/shieldsPannelState'
+// import * as shieldsPanelState from '../../state/shieldsPanelState'
+
 export const addSiteCosmeticFilter = async (origin: string, cssfilter: string) => {
   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     let storeList = Object.assign({}, storeData.cosmeticFilterList)
@@ -18,28 +24,64 @@ export const removeSiteFilter = (origin: string) => {
   })
 }
 
-export const applySiteFilters = (hostname: string) => {
-  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
+export const removeAllFilters = () => {
+  chrome.storage.local.set({ 'cosmeticFilterList': {} })
+}
+
+export const applyDOMCosmeticFilters = (tabData: Tab, tabId: number) => {
+  let hostname = tabData.hostname
+  // let updatedFilterList = Object.assign(tabData.appliedFilterList)
+  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
+    if (!storeData.cosmeticFilterList) {
+      console.info('applySiteFilters: no cosmetic filter store yet')
+      return
+    }
+    if (storeData.cosmeticFilterList[hostname] !== undefined) {
+      storeData.cosmeticFilterList[hostname].map((filter: string) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
+        chrome.tabs.executeScript({
+          // this is executed in the content script context
+          code: `
+          (function () {
+            let filter = '${filter}'
+            let addedNodeList = NodeList
+            addedNodeList = document.querySelectorAll(filter)
+            console.log('${filter} exists:', addedNodeList.length > 0)
+            if (addedNodeList.length > 0) {
+              addedNodeList.forEach((element, currentIndex = 0) => {
+                element.remove()
+                console.log('mutation observer: ${filter} removed')
+              })
+          	}})()
+          `
+        })
+        // console.log(`${filter} removed`)
+        // updatedFilterList.appliedFilterList[filter] = true
+        // console.log(updatedFilterList)
+        // }
+      })
+    }
+  })
+}
+
+export const applyCSSCosmeticFilters = (tabData: Tab, tabId: number) => {
+  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
     if (!storeData.cosmeticFilterList) {
       if (process.env.NODE_ENV === 'shields_development') {
         console.log('applySiteFilters: no cosmetic filter store yet')
       }
       return
     }
+    let hostname = tabData.hostname
     if (storeData.cosmeticFilterList[hostname] !== undefined) {
-      storeData.cosmeticFilterList[hostname].map((rule: string) => {
+      storeData.cosmeticFilterList[hostname].map((filter: string) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
         if (process.env.NODE_ENV === 'shields_development') {
-          console.log('applying rule', rule)
+          console.log('applying filter', filter)
         }
         chrome.tabs.insertCSS({
-          code: `${rule} {display: none;}`,
+          code: `${filter} {display: none;}`,
           runAt: 'document_start'
         })
       })
     }
   })
-}
-
-export const removeAllFilters = () => {
-  chrome.storage.local.set({ 'cosmeticFilterList': {} })
 }
