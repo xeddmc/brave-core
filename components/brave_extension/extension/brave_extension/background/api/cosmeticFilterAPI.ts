@@ -28,41 +28,6 @@ export const removeAllFilters = () => {
   chrome.storage.local.set({ 'cosmeticFilterList': {} })
 }
 
-export const applyDOMCosmeticFilters = (tabData: Tab, tabId: number) => {
-  let hostname = tabData.hostname
-  // let updatedFilterList = Object.assign(tabData.appliedFilterList)
-  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-    if (!storeData.cosmeticFilterList) {
-      console.info('applySiteFilters: no cosmetic filter store yet')
-      return
-    }
-    if (storeData.cosmeticFilterList[hostname] !== undefined) {
-      storeData.cosmeticFilterList[hostname].map((filter: string) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
-        chrome.tabs.executeScript({
-          // this is executed in the content script context
-          code: `
-          (function () {
-            let filter = '${filter}'
-            let addedNodeList = NodeList
-            addedNodeList = document.querySelectorAll(filter)
-            console.log('${filter} exists:', addedNodeList.length > 0)
-            if (addedNodeList.length > 0) {
-              addedNodeList.forEach((element, currentIndex = 0) => {
-                element.remove()
-                console.log('mutation observer: ${filter} removed')
-              })
-          	}})()
-          `
-        })
-        // console.log(`${filter} removed`)
-        // updatedFilterList.appliedFilterList[filter] = true
-        // console.log(updatedFilterList)
-        // }
-      })
-    }
-  })
-}
-
 export const applyCSSCosmeticFilters = (tabData: Tab, tabId: number) => {
   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
     if (!storeData.cosmeticFilterList) {
@@ -85,3 +50,16 @@ export const applyCSSCosmeticFilters = (tabData: Tab, tabId: number) => {
     }
   })
 }
+
+chrome.runtime.onConnect.addListener(function (port) {
+  console.assert(port.name === 'knockknock')
+  port.onMessage.addListener(function (msg) {
+    if (msg.joke === 'Knock knock') {
+      port.postMessage({ question: 'Who\'s there?' })
+    } else if (msg.answer === 'Madame') {
+      port.postMessage({ question: 'Madame who?' })
+    } else if (msg.answer === 'Madame... Bovary') {
+      port.postMessage({ question: "I don't get it." })
+    }
+  })
+})

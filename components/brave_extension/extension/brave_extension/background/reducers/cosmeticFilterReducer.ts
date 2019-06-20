@@ -17,21 +17,15 @@ import { reloadTab } from '../api/tabsAPI'
 import {
   removeSiteFilter,
   addSiteCosmeticFilter,
-  applyDOMCosmeticFilters,
+  // applyDOMCosmeticFilters,
   applyCSSCosmeticFilters,
   removeAllFilters
 } from '../api/cosmeticFilterAPI'
-import { debounce } from '../../../../../common/debounce'
 
 // State helpers
 import * as shieldsPanelState from '../../state/shieldsPanelState'
 import * as noScriptState from '../../state/noScriptState'
 import { getOrigin } from '../../helpers/urlUtils'
-
-// export const debounce = function<T>(fn: (data: T) => void, bufferInterval: number, ...args: Array<any>) {
-const applyDOMCosmeticFilterDebounce = debounce((data: any) => {
-  applyDOMCosmeticFilters(data.tabData, data.tabId)
-}, 1000 / 60) // 60 fps
 
 const focusedWindowChanged = (state: State, windowId: number): State => {
   if (windowId !== -1) {
@@ -74,31 +68,6 @@ export default function cosmeticFilterReducer (state: State = {
       // updateCustomFilters(state.settings.customFilters)
 
       applyCSSCosmeticFilters(tabData, action.tabId)
-      chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-        let notToBeApplied: Boolean
-        // !storeData.cosmeticFilterList || storeData.cosmeticFilterList.length === 0 // if it doesn't exist, don't apply mutation observer
-        if (!storeData.cosmeticFilterList) {
-          notToBeApplied = true
-          console.log('storeData.cosmeticFilterList does not exist')
-        } else if (Object.keys(storeData.cosmeticFilterList).length === 0) {
-          notToBeApplied = true
-          console.log('storeData.cosmeticFilterList length === 0')
-        } else {
-          notToBeApplied = false
-        }
-        if (!notToBeApplied) { // to be applied
-          console.log('ON COMMITTED MUTATION OBSERVER BEING APPLIED:')
-          chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-            console.log('cosmeticFilterList.length:', Object.keys(storeData.cosmeticFilterList).length)
-          })
-          applyDOMCosmeticFilterDebounce({
-            tabData: tabData,
-            tabId: action.tabId
-          })
-        } else {
-          console.log('ON COMMITTED MUTATION OBSERVER NOT APPLIED')
-        }
-      })
       console.log('applying CSS filters')
       break
     }
