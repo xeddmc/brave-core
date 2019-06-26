@@ -89,20 +89,20 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch fi
 //   })
 // }
 
-let observer = new MutationObserver(function (mutations) {
-  mutations.forEach(function (mutation) {
-    console.log(mutation.type)
-  })
-})
+// let observer = new MutationObserver(function (mutations) {
+//   mutations.forEach(function (mutation) {
+//     console.log(mutation.type)
+//   })
+// })
 
-let observerConfig = {
-  attributes: true,
-  childList: true,
-  characterData: true
-}
+// let observerConfig = {
+//   attributes: true,
+//   childList: true,
+//   characterData: true
+// }
 
-let targetNode = document.body
-observer.observe(targetNode, observerConfig)
+// let targetNode = document.body
+// observer.observe(targetNode, observerConfig)
 
 // MutationObserver(applyDOMCosmeticFilters())
 
