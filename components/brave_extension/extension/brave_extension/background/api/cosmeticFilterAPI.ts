@@ -18,7 +18,6 @@ import { Tab } from '../../types/state/shieldsPannelState'
 
 export const addSiteCosmeticFilter = async (origin: string, cssfilter: string) => {
   console.log('test API SITE COSMETIC FILTER')
-  console.log('test')
   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     let storeList = Object.assign({}, storeData.cosmeticFilterList)
     if (storeList[origin] === undefined || storeList[origin].length === 0) { // nothing in filter list for origin
@@ -109,7 +108,7 @@ function isIdempotent (str: String) {
 
 /*
 cosmeticFilterList: {
-  domain.com: {
+  domain.com: [{
     {
       filter: string,
       isIdempotent: boolean,
@@ -117,7 +116,7 @@ cosmeticFilterList: {
     },
     {
     }
-  }
+  }]
   domain2.com: {...}
 }
 

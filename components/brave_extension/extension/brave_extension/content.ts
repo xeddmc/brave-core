@@ -1,44 +1,20 @@
 const unique = require('unique-selector').default
-// import { debounce } from '../../../common/debounce'
+import { debounce } from '../../../common/debounce'
+import { query } from './background/events/cosmeticFilterEvents'
 
 let target: EventTarget | null
-let siteFilters = {}
+let contentSiteFilters: any
+// let contentSiteFilters: Array<object>
 
 if (process.env.NODE_ENV === 'development') {
   console.info('development content script here')
 }
 
-// const applyDOMCosmeticFilterDebounce = debounce((data: any) => {
-//   // applyDOMCosmeticFilters()
-//   // sendMessage
-//   console.log(Date.now(), 'debounced call')
-// }, 1000 / 60) // 60 fps, 16.67ms minimum time between calls
-
 function getCurrentURL () {
   return window.location.hostname
 }
 
-document.addEventListener('contextmenu', (event) => {
-  // send host and store target
-  // `target` needed for when background page handles `addBlockElement`
-  target = event.target
-  chrome.runtime.sendMessage({
-    type: 'contextMenuOpened',
-    baseURI: getCurrentURL()
-  })
-}, true)
-
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  const action = typeof msg === 'string' ? msg : msg.type
-  switch (action) {
-    case 'getTargetSelector': {
-      sendResponse(unique(target))
-    }
-  }
-})
-
-
-// when page loads, grab filter list
+// when page loads, grab filter list and only activate if there are rules
 chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
   if (!storeData.cosmeticFilterList) {
     if (process.env.NODE_ENV === 'development') {
@@ -46,8 +22,8 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     }
     return
   }
-  Object.assign(siteFilters, storeData.cosmeticFilterList)
-  console.log('current site list in content script', siteFilters)
+  Object.assign(contentSiteFilters, storeData.cosmeticFilterList[getCurrentURL()])
+  console.log('current site list in content script', contentSiteFilters)
 })
 
 // on load retrieve each website's filter list
@@ -70,52 +46,76 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch fi
     chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
       console.log('cosmeticFilterList.length:', Object.keys(storeData.cosmeticFilterList).length)
     })
-    // applyDOMCosmeticFilterDebounce()
+    applyDOMCosmeticFilterDebounce()
   } else {
     console.log('ON COMMITTED MUTATION OBSERVER NOT APPLIED')
   }
 })
 
-// const applyDOMCosmeticFilters = function () {
-//   let hostname = getCurrentURL()
-//   storeData.cosmeticFilterList[hostname].map((filter: string) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
-//     let addedNodeList: NodeList
-//     addedNodeList = document.querySelectorAll(filter)
-//     console.log('${filter} exists:', addedNodeList.length > 0)
-//     if (addedNodeList.length > 0) {
-//       addedNodeList.forEach((node, currentIndex = 0) => {
-//         // node.remove()
-//         console.log('mutation observer: ${filter} removed')
-//       })
-//     }
-//   })
-// }
+const applyDOMCosmeticFilterDebounce = function () {
+  console.log(Date.now(), 'debounced call')
+  let targetNode = document.body
+  let observer = new MutationObserver(function (mutations) {
+    let debouncedRemove = debounce((contentSiteFilters: Array<object>) => {
+      // console.log('data')
+      removeAll(contentSiteFilters)
+    }, 1000 / 60)
 
-// let observer = new MutationObserver(function (mutations) {
-//   mutations.forEach(function (mutation) {
-//     console.log(mutation.type)
-//   })
-// })
+  })
+  let observerConfig = {
+    childList: true,
+    subtree: true
+    // characterData: true
+  }
+  observer.observe(targetNode, observerConfig)
+}
 
-// let observerConfig = {
-//   attributes: true,
-//   childList: true,
-//   characterData: true
-// }
-
-// let targetNode = document.body
-// observer.observe(targetNode, observerConfig)
+function removeAll (siteFilters: any) {
+  /*
+    let contentSiteFilters = [{
+    'filter': 'filter1',
+    'isIdempotent': true,
+    'applied': false
+  }, {
+    'filter': 'filter2',
+    'isIdempotent': false,
+    'applied': false
+  }, {
+    'filter': 'filter3',
+    'isIdempotent': false,
+    'applied': false
+  }]
+  */
+  // array of site filters, go through each one and check if idempotent/already applied
+  siteFilters.map((filter) => {
+    if (!filter.isIdempotent || !filter.applied) { // don't apply if filter is idempotent AND was already applied
+      if (document.querySelector(siteFilters.length) > 0) { // attempt filter application
+        document.querySelectorAll(siteFilters).forEach(e => {
+          e.remove()
+        })
+      }
+      filter.applied = true
+    }
+  })
+}
 
 // MutationObserver(applyDOMCosmeticFilters())
 
-// export const applyDOMCosmeticFilters = (tabData: Tab, tabId: number) => {
-//   let hostname = tabData.hostname
-//   // let updatedFilterList = Object.assign(tabData.appliedFilterList)
-//   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-//     if (!storeData.cosmeticFilterList) {
-//       console.info('applySiteFilters: no cosmetic filter store yet')
-//       return
-//     }
+document.addEventListener('contextmenu', (event) => {
+  // send host and store target
+  // `target` needed for when background page handles `addBlockElement`
+  target = event.target
+  chrome.runtime.sendMessage({
+    type: 'contextMenuOpened',
+    baseURI: getCurrentURL()
+  })
+}, true)
 
-//   })
-// }
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  const action = typeof msg === 'string' ? msg : msg.type
+  switch (action) {
+    case 'getTargetSelector': {
+      sendResponse(unique(target))
+    }
+  }
+})
