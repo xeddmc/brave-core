@@ -69,20 +69,21 @@ function applyDOMCosmeticFilterDebounce (filterList: any) {
 }
 
 function removeAll (siteFilters: any) {
-  console.log('removeAll function called')
   // array of site filters, go through each one and check if idempotent/already applied
-  siteFilters.map((filterData: any) => {
-    if (!filterData.isIdempotent || !filterData.applied) { // don't apply if filter is idempotent AND was already applied
-      if (document.querySelector(filterData.filter)) { // attempt filter application
-        console.log(filterData.filter)
-        document.querySelectorAll(filterData.filter).forEach(e => {
-          e.remove()
-          filterData.applied = true
-        })
+  if (siteFilters) {
+    siteFilters.map((filterData: any) => {
+      console.log(filterData.filter)
+      if (!filterData.isIdempotent || !filterData.applied) { // don't apply if filter is idempotent AND was already applied
+        if (document.querySelector(filterData.filter)) { // attempt filter application
+          document.querySelectorAll(filterData.filter).forEach(e => {
+            e.remove()
+            filterData.applied = true
+          })
+        }
+        console.log(siteFilters)
       }
-      console.log(siteFilters)
-    }
-  })
+    })
+  }
   /*
     let contentSiteFilters = [{
     'filter': 'filter1',

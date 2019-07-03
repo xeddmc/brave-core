@@ -61,8 +61,8 @@ export default function cosmeticFilterReducer (state: State = {
         state = shieldsPanelState.resetBlockingResources(state, action.tabId)
         state = noScriptState.resetNoScriptInfo(state, action.tabId, getOrigin(action.url))
       }
-      applyCSSCosmeticFilters(tabData, action.tabId)
-      console.log('applying CSS filters')
+      // applyCSSCosmeticFilters(tabData, action.tabId)
+      // console.log('applying CSS filters')
       break
     }
     case windowTypes.WINDOW_REMOVED: {
