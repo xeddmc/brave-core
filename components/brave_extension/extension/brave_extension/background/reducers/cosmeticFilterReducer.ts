@@ -61,12 +61,6 @@ export default function cosmeticFilterReducer (state: State = {
         state = shieldsPanelState.resetBlockingResources(state, action.tabId)
         state = noScriptState.resetNoScriptInfo(state, action.tabId, getOrigin(action.url))
       }
-      // applySiteFilters(tabData.hostname)
-      // applyCSSCosmeticFilters(tabData)
-      // check if storage list is > 0
-      // if it is, call applyCOMCosmeticFilterDebounce
-      // updateCustomFilters(state.settings.customFilters)
-
       applyCSSCosmeticFilters(tabData, action.tabId)
       console.log('applying CSS filters')
       break

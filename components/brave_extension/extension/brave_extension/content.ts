@@ -1,6 +1,5 @@
 const unique = require('unique-selector').default
 import { debounce } from '../../../common/debounce'
-import { query } from './background/events/cosmeticFilterEvents'
 
 let target: EventTarget | null
 let contentSiteFilters: any
@@ -22,45 +21,44 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     }
     return
   }
-  Object.assign(contentSiteFilters, storeData.cosmeticFilterList[getCurrentURL()])
-  console.log('current site list in content script', contentSiteFilters)
+  console.log('storeData.cosmeticFilterList', storeData.cosmeticFilterList)
+  console.log('storeData.cosmeticFilterList[getCurrentURL()]', storeData.cosmeticFilterList[getCurrentURL()])
+  // add length check here (can't read property slice of undefined)
+  if (storeData.cosmeticFilterList[getCurrentURL()]) {
+    contentSiteFilters = storeData.cosmeticFilterList[getCurrentURL()].slice()
+    console.log('contentSiteFilters', contentSiteFilters)
+    console.log('current site list in content script', contentSiteFilters)
+  }
 })
+
+let debouncedRemove = debounce((siteFilters: Array<object>) => {
+  console.log('REMOVING HERE')
+  removeAll(siteFilters)
+}, 1000 / 60)
 
 // on load retrieve each website's filter list
 chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-  let notToBeApplied: Boolean
   // !storeData.cosmeticFilterList || storeData.cosmeticFilterList.length === 0 // if no rules, don't apply mutation observer
 
   if (!storeData.cosmeticFilterList) {
-    notToBeApplied = true
     console.log('storeData.cosmeticFilterList does not exist')
   } else if (Object.keys(storeData.cosmeticFilterList).length === 0) {
-    notToBeApplied = true
     console.log('storeData.cosmeticFilterList length === 0')
   } else {
-    notToBeApplied = false
-  }
-
-  if (!notToBeApplied) { // to be applied
+    applyDOMCosmeticFilterDebounce(contentSiteFilters)
     console.log('ON COMMITTED MUTATION OBSERVER BEING APPLIED:')
     chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
       console.log('cosmeticFilterList.length:', Object.keys(storeData.cosmeticFilterList).length)
     })
-    applyDOMCosmeticFilterDebounce()
-  } else {
-    console.log('ON COMMITTED MUTATION OBSERVER NOT APPLIED')
   }
 })
 
-const applyDOMCosmeticFilterDebounce = function () {
-  console.log(Date.now(), 'debounced call')
+function applyDOMCosmeticFilterDebounce (filterList: any) {
+  console.log('applyDOMCosmeticFilterDebounce call')
   let targetNode = document.body
   let observer = new MutationObserver(function (mutations) {
-    let debouncedRemove = debounce((contentSiteFilters: Array<object>) => {
-      // console.log('data')
-      removeAll(contentSiteFilters)
-    }, 1000 / 60)
-
+    console.log('mutation observed')
+    debouncedRemove(filterList)
   })
   let observerConfig = {
     childList: true,
@@ -71,6 +69,20 @@ const applyDOMCosmeticFilterDebounce = function () {
 }
 
 function removeAll (siteFilters: any) {
+  console.log('removeAll function called')
+  // array of site filters, go through each one and check if idempotent/already applied
+  siteFilters.map((filterData: any) => {
+    if (!filterData.isIdempotent || !filterData.applied) { // don't apply if filter is idempotent AND was already applied
+      if (document.querySelector(filterData.filter)) { // attempt filter application
+        console.log(filterData.filter)
+        document.querySelectorAll(filterData.filter).forEach(e => {
+          e.remove()
+          filterData.applied = true
+        })
+      }
+      console.log(siteFilters)
+    }
+  })
   /*
     let contentSiteFilters = [{
     'filter': 'filter1',
@@ -86,17 +98,7 @@ function removeAll (siteFilters: any) {
     'applied': false
   }]
   */
-  // array of site filters, go through each one and check if idempotent/already applied
-  siteFilters.map((filter) => {
-    if (!filter.isIdempotent || !filter.applied) { // don't apply if filter is idempotent AND was already applied
-      if (document.querySelector(siteFilters.length) > 0) { // attempt filter application
-        document.querySelectorAll(siteFilters).forEach(e => {
-          e.remove()
-        })
-      }
-      filter.applied = true
-    }
-  })
+
 }
 
 // MutationObserver(applyDOMCosmeticFilters())

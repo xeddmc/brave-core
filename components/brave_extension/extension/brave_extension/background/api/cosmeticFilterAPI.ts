@@ -18,6 +18,7 @@ import { Tab } from '../../types/state/shieldsPannelState'
 
 export const addSiteCosmeticFilter = async (origin: string, cssfilter: string) => {
   console.log('test API SITE COSMETIC FILTER')
+  console.log('test')
   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     let storeList = Object.assign({}, storeData.cosmeticFilterList)
     if (storeList[origin] === undefined || storeList[origin].length === 0) { // nothing in filter list for origin
@@ -50,26 +51,28 @@ export const removeAllFilters = () => {
 }
 
 export const applyCSSCosmeticFilters = (tabData: Tab, tabId: number) => {
-  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-    if (!storeData.cosmeticFilterList) {
-      if (process.env.NODE_ENV === 'shields_development') {
-        console.log('applySiteFilters: no cosmetic filter store yet')
-      }
-      return
-    }
-    let hostname = tabData.hostname
-    if (storeData.cosmeticFilterList[hostname] !== undefined) {
-      storeData.cosmeticFilterList[hostname].map((rule: any) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
-        if (process.env.NODE_ENV === 'shields_development') {
-          console.log('applying filter', rule.filter)
-        }
-        chrome.tabs.insertCSS({
-          code: `${rule.filter} {display: none;}`,
-          runAt: 'document_start'
-        })
-      })
-    }
-  })
+  // chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
+  //   if (!storeData.cosmeticFilterList) {
+  //     if (process.env.NODE_ENV === 'shields_development') {
+  //       console.log('applySiteFilters: no cosmetic filter store yet')
+  //     }
+  //     return
+  //   }
+  //   let hostname = tabData.hostname
+  //   if (storeData.cosmeticFilterList[hostname] !== undefined) {
+  //     storeData.cosmeticFilterList[hostname].map((rule: any) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
+  //       if (process.env.NODE_ENV === 'shields_development') {
+  //         console.log('applying filter', rule.filter)
+  //       }
+  //       chrome.tabs.insertCSS({
+  //         code: `${rule.filter} {display: none;}`,
+  //         runAt: 'document_start'
+  //       })
+  //     })
+  //   }
+  // })
+
+  // do nothing
 }
 
 function isIdempotent (str: String) {
@@ -100,10 +103,10 @@ function isIdempotent (str: String) {
 
   for (let i = 0; i < nonIdempotentStrings.length; i++) {
     if (str.includes(nonIdempotentStrings[i])) {
-      return false
+      return true
     }
   }
-  return true
+  return false
 }
 
 /*
