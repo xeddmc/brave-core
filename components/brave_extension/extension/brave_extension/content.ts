@@ -37,7 +37,9 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   }
 })
 
-chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
+
+// when page loads, grab filter list
+chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
   if (!storeData.cosmeticFilterList) {
     if (process.env.NODE_ENV === 'development') {
       console.info('applySiteFilters: no cosmetic filter store yet')
@@ -45,7 +47,7 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch fi
     return
   }
   Object.assign(siteFilters, storeData.cosmeticFilterList)
-  console.log(siteFilters)
+  console.log('current site list in content script', siteFilters)
 })
 
 // on load retrieve each website's filter list
