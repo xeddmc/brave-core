@@ -55,7 +55,7 @@ chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch fi
 
 function applyDOMCosmeticFilterDebounce (filterList: any) {
   console.log('applyDOMCosmeticFilterDebounce call')
-  let targetNode = document.body
+  let targetNode = document.documentElement
   let observer = new MutationObserver(function (mutations) {
     console.log('mutation observed')
     debouncedRemove(filterList)
