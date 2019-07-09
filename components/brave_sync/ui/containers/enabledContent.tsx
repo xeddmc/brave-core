@@ -8,7 +8,6 @@ import * as React from 'react'
 import { Button, AlertBox } from 'brave-ui'
 import { CloseCircleIcon } from 'brave-ui/components/icons'
 import Table, { Cell, Row } from 'brave-ui/components/dataTables/table'
-import { Toggle } from 'brave-ui/features/shields'
 
 // Feature-specific components
 import {
@@ -25,8 +24,9 @@ import {
   TableButtonGrid,
   EnabledContent,
   SyncCardContent,
+  Toggle,
   SyncCard
-} from 'brave-ui/features/sync'
+} from '../components'
 
 // Modals
 import RemoveDeviceModal from './modals/removeDevice'
