@@ -155,7 +155,7 @@ bool BraveMainDelegate::BasicStartupComplete(int* exit_code) {
   // Disabled features.
   const std::unordered_set<const char*> disabled_features = {
       autofill::features::kAutofillServerCommunication.name,
-      //network::features::kNetworkService.name,
+      // network::features::kNetworkService.name,
       unified_consent::kUnifiedConsent.name,
 #if !defined(CHROME_MULTIPLE_DLL_CHILD) && !BUILDFLAG(ENABLE_BRAVE_TRANSLATE)
       translate::kTranslateUI.name,  // only available in browser process
