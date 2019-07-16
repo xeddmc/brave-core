@@ -9,7 +9,7 @@ import * as React from 'react'
 import { ToggleAdvancedView } from '../../types/actions/shieldsPanelActions'
 
 // Feature-specific components
-import { MainFooter, Link } from 'brave-ui/features/shields'
+import { MainFooter, Link } from '../../components'
 
 // API
 import * as tabsAPI from '../../background/api/tabsAPI'

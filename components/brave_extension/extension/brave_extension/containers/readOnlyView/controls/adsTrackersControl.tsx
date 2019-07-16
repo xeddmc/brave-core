@@ -15,7 +15,7 @@ import {
   BlockedInfoRowStats,
   BlockedListStatic,
   dummyData
-} from 'brave-ui/features/shields'
+} from '../../../components'
 
 // Group components
 import StaticResourcesList from '../../shared/resourcesBlockedList/staticResourcesList'
