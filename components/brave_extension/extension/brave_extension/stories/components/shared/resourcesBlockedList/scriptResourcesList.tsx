@@ -11,7 +11,7 @@ import {
   BlockedListItemSummary,
   BlockedListItemWithOptions,
   LinkAction
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Types
 import { NoScriptInfoInterface } from '../../../types'

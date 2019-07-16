@@ -33,7 +33,7 @@ import {
   BlockedListItemHeaderStats,
   BlockedListItemHeaderText,
   ShieldsButton
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Helpers
 import { getLocale } from '../../../fakeLocale'

@@ -23,7 +23,7 @@ import {
   ShieldIcon,
   DisabledContentText,
   Toggle
- } from '../../../../../src/features/shields'
+ } from '../../../components'
 
 // Fake data
 import { getLocale } from '../../fakeLocale'

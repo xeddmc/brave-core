@@ -4,7 +4,7 @@
 
 import * as React from 'react'
 
-import { MainFooter, Link } from '../../../../../src/features/shields'
+import { MainFooter, Link } from '../../../components'
 
 // Fake data
 import { getLocale } from '../../fakeLocale'

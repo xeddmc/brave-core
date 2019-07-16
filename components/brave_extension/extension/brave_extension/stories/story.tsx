@@ -4,23 +4,23 @@
 
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import shieldsLightTheme from '../../../src/theme/shields-light'
-import shieldsDarkTheme from '../../../src/theme/shields-dark'
-import { withThemesProvider } from 'storybook-addon-styled-component-theme'
+// import shieldsLightTheme from 'brave-ui/theme/shields-light'
+// import shieldsDarkTheme from 'brave-ui/theme/shields-dark'
+// import { withThemesProvider } from 'storybook-addon-styled-component-theme'
 // @ts-ignore
 import { withKnobs, boolean, number } from '@storybook/addon-knobs'
 import { withState } from '@dump247/storybook-state'
-const favicon = require('../../assets/img/fake_favicon.png')
+// const favicon = require('../../assets/img/fake_favicon.png')
 
 // Components
 import Shields from './index'
 import ShieldsReadOnlyView from './components/readOnlyView'
 
 // Themes
-const themes = [shieldsLightTheme, shieldsDarkTheme]
+// const themes = [shieldsLightTheme, shieldsDarkTheme]
 
-storiesOf('Feature Components/Shields', module)
-  .addDecorator(withThemesProvider(themes))
+storiesOf('Shields', module)
+  // .addDecorator(withThemesProvider(themes))
   .addDecorator(withKnobs)
   .add('Panel', withState({ enabled: true, advancedView: false, readOnlyView: false, firstAccess: true }, (store) => {
     const fakeOnChangeShieldsEnabled = () => {
@@ -41,7 +41,7 @@ storiesOf('Feature Components/Shields', module)
           store.state.readOnlyView
           ? (
             <ShieldsReadOnlyView
-              favicon={favicon}
+              favicon={'favicon'}
               hostname={'buzzfeed.com'}
               onClose={fakeOnChangeReadOnlyView}
             />
@@ -49,7 +49,7 @@ storiesOf('Feature Components/Shields', module)
             <Shields
               enabled={boolean('Enabled?', store.state.enabled)}
               firstAccess={boolean('First Access?', store.state.firstAccess)}
-              favicon={favicon}
+              favicon={'favicon'}
               hostname={'buzzfeed.com'}
               advancedView={boolean('Show advanced view?', store.state.advancedView)}
               adsTrackersBlocked={number('3rd-party trackers blocked', 80) || 0}

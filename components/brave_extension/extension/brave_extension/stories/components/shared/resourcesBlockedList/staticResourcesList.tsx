@@ -5,7 +5,7 @@
 import * as React from 'react'
 
 // Feature-specific components
-import { BlockedListItem } from '../../../../../../src/features/shields'
+import { BlockedListItem } from '../../../../components'
 
 // Helpers
 import { stripProtocolFromUrl } from '../../../helpers'

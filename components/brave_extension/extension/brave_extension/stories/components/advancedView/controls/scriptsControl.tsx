@@ -13,7 +13,7 @@ import {
   BlockedInfoRowText,
   Toggle,
   LinkAction
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Group Components
 import NoScriptOverlay from '../overlays/noScriptOverlay'

@@ -16,7 +16,7 @@ import {
   BlockedInfoRowStats,
   BlockedListSummaryText,
   ShieldsButton
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Group components
 import StaticResourcesList from '../../shared/resourcesBlockedList/staticResourcesList'

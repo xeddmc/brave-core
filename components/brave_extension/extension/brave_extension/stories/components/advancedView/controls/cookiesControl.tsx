@@ -5,7 +5,7 @@
 import * as React from 'react'
 
 // Feature-specific components
-import { BlockedInfoRowSingle, SelectBox } from '../../../../../../src/features/shields'
+import { BlockedInfoRowSingle, SelectBox } from '../../../../components'
 
 // Fake data
 import { getLocale } from '../../../fakeLocale'

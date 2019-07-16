@@ -8,7 +8,7 @@ import * as React from 'react'
 import {
   BlockedInfoRowSingleText,
   BlockedInfoRowText
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Helpers
 import { getLocale } from '../../../fakeLocale'

@@ -11,10 +11,10 @@ import {
   WarningIcon,
   WarningText,
   ShieldsButton
-} from '../../../../../../src/features/shields'
+} from '../../../../components'
 
 // Shared components
-import { Card } from '../../../../../../src/components'
+import { Card } from 'brave-ui'
 
 // Helpers
 import { getLocale } from '../../../fakeLocale'
