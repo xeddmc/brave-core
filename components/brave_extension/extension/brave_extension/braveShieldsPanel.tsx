@@ -9,7 +9,7 @@ import shieldsLightTheme from 'brave-ui/theme/shields-light'
 import { Provider } from 'react-redux'
 import { Store } from 'react-chrome-redux'
 import BraveCoreThemeProvider from '../../../common/BraveCoreThemeProvider'
-import BraveShields from './containers/braveShields'
+import App from './containers/app'
 require('../../../fonts/muli.css')
 require('../../../fonts/poppins.css')
 
@@ -30,7 +30,7 @@ Promise.all([
         dark={shieldsDarkTheme}
         light={shieldsLightTheme}
       >
-        <BraveShields />
+        <App />
       </BraveCoreThemeProvider>
     </Provider>,
     mountNode
