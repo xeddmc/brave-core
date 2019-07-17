@@ -724,7 +724,8 @@ bool AdsServiceImpl::MigratePrefs(
       mappings {
     // {{from version, to version}, function}
     {{1, 2}, &AdsServiceImpl::MigratePrefsVersion1To2},
-    {{2, 3}, &AdsServiceImpl::MigratePrefsVersion2To3}
+    {{2, 3}, &AdsServiceImpl::MigratePrefsVersion2To3},
+    {{3, 4}, &AdsServiceImpl::MigratePrefsVersion3To4}
   };
 
   // Cycle through migration paths, i.e. if upgrading from version 2 to 5 we
@@ -805,6 +806,16 @@ void AdsServiceImpl::MigratePrefsVersion2To3() const {
   MayBeShowFirstLaunchNotificationForSupportedRegion(region, new_regions);
 }
 
+void AdsServiceImpl::MigratePrefsVersion3To4() const {
+  DCHECK_EQ(3, GetPrefsVersion()) << "Invalid migration path";
+
+  if (!ads::Ads::IsSupportedRegion()) {
+    return;
+  }
+
+  ShowFirstLaunchNotificationForSupportedRegion(true);
+}
+
 int AdsServiceImpl::GetPrefsVersion() const {
   return profile_->GetPrefs()->GetInteger(prefs::kVersion);
 }
@@ -842,18 +853,22 @@ void AdsServiceImpl::MayBeShowFirstLaunchNotificationForSupportedRegion(
     return;
   }
 
-  auto* prefs = profile_->GetPrefs();
-  prefs->SetBoolean(prefs::kHasRemovedFirstLaunchNotification, false);
-  prefs->SetUint64(prefs::kLastShownFirstLaunchNotificationTimestamp, 0);
-
   if (std::find(supported_regions.begin(), supported_regions.end(), region)
       == supported_regions.end()) {
     // Do not show first launch notification for unsupported region
-  prefs->SetBoolean(prefs::kShouldShowFirstLaunchNotification, false);
+    ShowFirstLaunchNotificationForSupportedRegion(false);
     return;
   }
 
-  prefs->SetBoolean(prefs::kShouldShowFirstLaunchNotification, true);
+  ShowFirstLaunchNotificationForSupportedRegion(true);
+}
+
+void AdsServiceImpl::ShowFirstLaunchNotificationForSupportedRegion(
+    const bool should_show) const {
+  auto* prefs = profile_->GetPrefs();
+  prefs->SetBoolean(prefs::kHasRemovedFirstLaunchNotification, false);
+  prefs->SetUint64(prefs::kLastShownFirstLaunchNotificationTimestamp, 0);
+  prefs->SetBoolean(prefs::kShouldShowFirstLaunchNotification, should_show);
 }
 
 bool AdsServiceImpl::IsSupportedRegion() const {

@@ -197,6 +197,7 @@ class AdsServiceImpl : public AdsService,
       const bool is_dry_run = false) const;
   void MigratePrefsVersion1To2() const;
   void MigratePrefsVersion2To3() const;
+  void MigratePrefsVersion3To4() const;
   int GetPrefsVersion() const;
   void OnPrefsChanged(const std::string& pref);
 
@@ -206,6 +207,8 @@ class AdsServiceImpl : public AdsService,
   void MayBeShowFirstLaunchNotificationForSupportedRegion(
     const std::string& region,
     const std::vector<std::string>& regions) const;
+  void ShowFirstLaunchNotificationForSupportedRegion(
+      const bool should_show) const;
 
   void OnCreate();
   void OnInitialize();
