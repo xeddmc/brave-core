@@ -36,10 +36,16 @@ async function initialize () {
   await updatePreferences()
 }
 
+// function loadPreferences () {
+//   const actions = dataFetchAPI.getActions()
+//   actions.preferencesUpdated(preferces)
+// }
+
 async function updatePreferences () {
   const preferences = await preferencesAPI.getPreferences()
   const actions = dataFetchAPI.getActions()
   actions.preferencesUpdated(preferences)
+  // console.log(preferences)
 }
 
 function updateStats () {

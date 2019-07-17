@@ -160,6 +160,7 @@ export const newTabReducer: Reducer<NewTab.State | undefined> = (state: NewTab.S
         ...state,
         ...preferences
       }
+      // console.log('preferences', JSON.stringify(preferences))
       break
 
     default:

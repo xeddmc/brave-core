@@ -18,6 +18,7 @@ export type Preferences = {
 }
 
 function getWebUIBooleanVal (key: string): boolean {
+  console.log(chrome.getVariableValue(key))
   return (chrome.getVariableValue(key).toLowerCase() === 'true')
 }
 
@@ -26,12 +27,14 @@ export function getPreferences (): Promise<Preferences> {
   // to be async even though it isn't right now.
   // Enforces practice of not setting directly
   // in a redux reducer.
-  return Promise.resolve({
+  const preferences = {
     showBackgroundImage: getWebUIBooleanVal('showBackgroundImage'),
     showStats: getWebUIBooleanVal('showStats'),
     showClock: getWebUIBooleanVal('showClock'),
     showTopSites: getWebUIBooleanVal('showTopSites')
-  })
+  }
+  console.log(JSON.stringify(preferences))
+  return Promise.resolve(preferences)
 }
 
 function sendSavePref (key: string, value: any) {

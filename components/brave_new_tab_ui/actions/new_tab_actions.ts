@@ -72,6 +72,8 @@ export const showSettingsMenu = () => action(types.NEW_TAB_SHOW_SETTINGS_MENU)
 
 export const closeSettingsMenu = () => action(types.NEW_TAB_CLOSE_SETTINGS_MENU)
 
+export const loadPreferences = () => action(types.NEW_TAB_LOAD_PREFERENCES)
+
 export const preferencesUpdated = (preferences: Preferences) => action(types.NEW_TAB_PREFERENCES_UPDATED, {
   preferences
 })

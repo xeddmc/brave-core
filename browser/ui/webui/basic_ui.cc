@@ -46,7 +46,9 @@ class BasicUI::BasicUIWebContentsObserver
 
   // content::WebContentsObserver overrides:
   void RenderViewReady() override {
+    // Check here
     host_->UpdateWebUIProperties();
+
   }
 
  private:
