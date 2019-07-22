@@ -85,9 +85,9 @@ export function onSelectorReturned (response: any) {
   }
 
   if (rule.selector && rule.selector.length > 0) {
-    chrome.tabs.insertCSS({
-      code: `${rule.selector} {display: none;}`
-    })
+    // chrome.tabs.insertCSS({
+    //   code: `${rule.selector} {display: none;}`
+    // })
     cosmeticFilterActions.siteCosmeticFilterAdded(rule.host, rule.selector)
   }
 }

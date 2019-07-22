@@ -51,28 +51,27 @@ export const removeAllFilters = () => {
 }
 
 export const applyCSSCosmeticFilters = (tabData: Tab, tabId: number) => {
-  // chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
-  //   if (!storeData.cosmeticFilterList) {
-  //     if (process.env.NODE_ENV === 'shields_development') {
-  //       console.log('applySiteFilters: no cosmetic filter store yet')
-  //     }
-  //     return
-  //   }
-  //   let hostname = tabData.hostname
-  //   if (storeData.cosmeticFilterList[hostname] !== undefined) {
-  //     storeData.cosmeticFilterList[hostname].map((rule: any) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
-  //       if (process.env.NODE_ENV === 'shields_development') {
-  //         console.log('applying filter', rule.filter)
-  //       }
-  //       chrome.tabs.insertCSS({
-  //         code: `${rule.filter} {display: none;}`,
-  //         runAt: 'document_start'
-  //       })
-  //     })
-  //   }
-  // })
-
-  // do nothing
+  chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => { // fetch filter list
+    if (!storeData.cosmeticFilterList) {
+      if (process.env.NODE_ENV === 'shields_development') {
+        console.log('applySiteFilters: no cosmetic filter store yet')
+      }
+      return
+    }
+    let hostname = tabData.hostname
+    if (storeData.cosmeticFilterList[hostname] !== undefined) {
+      storeData.cosmeticFilterList[hostname].map((rule: any) => { // if the filter hasn't been applied once before, apply it and set the corresponding filter to true
+        if (process.env.NODE_ENV === 'shields_development') {
+          console.log('applying filter', rule.filter)
+        }
+        chrome.tabs.insertCSS({ // // tabId, details, callback
+          code: `${rule.filter} {display:none!important;}`,
+          cssOrigin: 'user',
+          runAt: 'document_start'
+        })
+      })
+    }
+  })
 }
 
 function isIdempotent (str: String) {
