@@ -35,6 +35,10 @@ class BravePrefProvider : public PrefProvider {
       ContentSettingsType content_type,
       const ResourceIdentifier& resource_identifier,
       std::unique_ptr<base::Value>&& value) override;
+  std::unique_ptr<RuleIterator> GetRuleIterator(
+      ContentSettingsType content_type,
+      const ResourceIdentifier& resource_identifier,
+      bool incognito) const override;
 
   // PrefProvider::pref_change_registrar_ alreay has plugin type.
   PrefChangeRegistrar brave_pref_change_registrar_;

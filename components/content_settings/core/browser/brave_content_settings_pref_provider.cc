@@ -9,10 +9,46 @@
 #include <utility>
 
 #include "base/bind.h"
+#include "brave/components/brave_shields/common/brave_shield_constants.h"
 #include "components/content_settings/core/browser/content_settings_pref.h"
 #include "components/content_settings/core/browser/website_settings_registry.h"
 
 namespace content_settings {
+
+namespace {
+
+class BraveShieldsRuleIterator : public RuleIterator {
+ public:
+  BraveShieldsRuleIterator(RuleIterator* brave_shields_iterator,
+                           RuleIterator* brave_cookies_iterator,
+                           RuleIterator* chromium_cookies_iterator)
+      : brave_shields_iterator_(brave_shields_iterator),
+        brave_cookies_iterator_(brave_cookies_iterator),
+        chromium_cookies_iterator_(chromium_cookies_iterator) {}
+
+  bool HasNext() const override {
+    return chromium_cookies_iterator_->HasNext() ||
+           brave_cookies_iterator_->HasNext();
+  }
+
+  Rule Next() override {
+    if (chromium_cookies_iterator_->HasNext())
+      return chromium_cookies_iterator_->Next();
+
+    // TODO(bridiver) - check through brave_shields and ignore cookie setting
+    // if brave_shields is disabled
+    return brave_cookies_iterator_->Next();
+  }
+
+ private:
+  RuleIterator* brave_shields_iterator_;
+  RuleIterator* brave_cookies_iterator_;
+  RuleIterator* chromium_cookies_iterator_;
+
+  DISALLOW_COPY_AND_ASSIGN(BraveShieldsRuleIterator);
+};
+
+}
 
 BravePrefProvider::BravePrefProvider(PrefService* prefs,
                                      bool incognito,
@@ -60,6 +96,24 @@ bool BravePrefProvider::SetWebsiteSetting(
   return PrefProvider::SetWebsiteSetting(primary_pattern, secondary_pattern,
                                          content_type, resource_identifier,
                                          std::move(in_value));
+}
+
+std::unique_ptr<RuleIterator> BravePrefProvider::GetRuleIterator(
+      ContentSettingsType content_type,
+      const ResourceIdentifier& resource_identifier,
+      bool incognito) const {
+  if (content_type == CONTENT_SETTINGS_TYPE_COOKIES) {
+    return std::make_unique<BraveShieldsRuleIterator>(
+        GetRuleIterator(CONTENT_SETTINGS_TYPE_PLUGINS,
+                        brave_shields::kBraveShields,
+                        incognito),
+        GetRuleIterator(CONTENT_SETTINGS_TYPE_PLUGINS,
+                        brave_shields::kCookies,
+                        incognito),
+        PrefProvider::GetRuleIterator(content_type,
+                                      resource_identifier,
+                                      incognito));
+  }
 }
 
 }  // namespace content_settings

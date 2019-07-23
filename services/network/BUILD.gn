@@ -1,0 +1,16 @@
+source_set("browser") {
+  if (!is_ios) {
+    sources = [
+      "brave_cookie_settings.cc",
+      "brave_cookie_settings.h",
+    ]
+
+    deps = [
+      "//base",
+      "//brave/components/content_settings/core/common",
+      "//services/network",
+      "//net",
+      "//url",
+    ]
+  }
+}

@@ -26,6 +26,11 @@ class BraveEphemeralProvider : public EphemeralProvider {
                          const ResourceIdentifier& resource_identifier,
                          std::unique_ptr<base::Value>&& value) override;
 
+  std::unique_ptr<RuleIterator> GetRuleIterator(
+      ContentSettingsType content_type,
+      const ResourceIdentifier& resource_identifier,
+      bool incognito) const override;
+
   DISALLOW_COPY_AND_ASSIGN(BraveEphemeralProvider);
 };
 

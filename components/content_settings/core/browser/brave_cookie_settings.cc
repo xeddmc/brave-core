@@ -88,6 +88,7 @@ void BraveCookieSettings::GetCookieSetting(
     const GURL& tab_url,
     content_settings::SettingSource* source,
     ContentSetting* cookie_setting) const {
+  LOG(ERROR) << "checking " << url << " : " << first_party_url << " : " << tab_url;
   DCHECK(cookie_setting);
 
   // copied from CookieSettings::GetCookieSetting
