@@ -27,6 +27,20 @@ std::vector<int> OrderToIntVect(const std::string& s) {
   return vec_int;
 }
 
+std::string ToOrderString(const std::vector<int> &vec_int) {
+  std::string ret;
+  for (size_t i = 0; i < vec_int.size(); ++i) {
+    if (vec_int[i] < 0) {
+      return "";
+    }
+    ret += std::to_string(vec_int[i]);
+    if (i != vec_int.size() - 1) {
+      ret += ".";
+    }
+  }
+  return ret;
+}
+
 bool CompareOrder(const std::string& left, const std::string& right) {
   // Return: true if left <  right
   // Split each and use C++ stdlib
@@ -35,6 +49,120 @@ bool CompareOrder(const std::string& left, const std::string& right) {
 
   return std::lexicographical_compare(vec_left.begin(), vec_left.end(),
     vec_right.begin(), vec_right.end());
+}
+
+namespace {
+
+std::string GetNextOrderFromPrevOrder(std::vector<int> &vec_int) {
+  DCHECK(vec_int.size() > 2);
+  int last_number = vec_int[vec_int.size() - 1];
+  DCHECK_GT(last_number, 0);
+  if (last_number <= 0) {
+    return "";
+  } else {
+    vec_int[vec_int.size() - 1]++;
+    return ToOrderString(vec_int);
+  }
+}
+
+
+std::string GetPrevOrderFromNextOrder(int last_number,
+    std::vector<int> &vec_result) {
+  DCHECK_GT(last_number, 0);
+  if (last_number <= 0) {
+    return "";
+  } else if (last_number == 1) {
+    return ToOrderString(vec_result) + ".0.1";
+  } else {
+    vec_result.push_back(last_number - 1);
+    return ToOrderString(vec_result);
+  }
+}
+
+std::string GetPrevOrderFromNextOrder(std::vector<int> &vec_int) {
+  DCHECK(vec_int.size() > 2);
+  int last_number = vec_int[vec_int.size() - 1];
+  DCHECK_GT(last_number, 0);
+  vec_int.resize(vec_int.size() - 1);
+  return GetPrevOrderFromNextOrder(last_number, vec_int);
+}
+
+}
+
+// Ported from https://github.com/brave/sync/blob/staging/client/bookmarkUtil.js
+std::string GetOrder(const std::string& prev, const std::string& next,
+    const std::string& parent) {
+  if (prev.empty() && next.empty()) {
+    return parent + ".1";
+  } else if (!prev.empty() && next.empty()) {
+    std::vector<int> vec = OrderToIntVect(prev);
+    return GetNextOrderFromPrevOrder(vec);
+  } else if (prev.empty() && !next.empty()) {
+    std::vector<int>  vec = OrderToIntVect(next);
+    DCHECK(vec.size() > 2);
+    return GetPrevOrderFromNextOrder(vec);
+  } else {
+    DCHECK(!prev.empty() && !next.empty());
+    std::vector<int> vec_prev = OrderToIntVect(prev);
+    DCHECK(vec_prev.size() > 2);
+    std::vector<int> vec_next = OrderToIntVect(next);
+    DCHECK(vec_next.size() > 2);
+
+    if (vec_prev.size() == vec_next.size()) {
+      // Orders have the same length
+      if (vec_next[vec_next.size() - 1] - vec_prev[vec_prev.size() - 1] > 1) {
+        vec_prev[vec_prev.size() - 1]++;
+        return ToOrderString(vec_prev);
+      } else {
+        return prev + ".1";
+      }
+    } else if (vec_next.size() > vec_prev.size()) {
+      // Next order is longer than previous order
+      // |prev_numbers_equal_to_next| means prev numbers except the last number
+      // are equal to corresponding next numbers
+      bool prev_numbers_equal_to_next = true;
+      for (size_t i = 0; i < vec_prev.size() - 1; ++i) {
+        if (vec_prev[i] != vec_next[i]) {
+          prev_numbers_equal_to_next = false;
+          break;
+        }
+      }
+
+      // result will be based on prev
+      std::vector<int> vec_result = vec_prev;
+
+      // If next has zeros beyond prev size, copy them to result
+      int current_index = vec_prev.size();
+      while (vec_next[current_index] == 0) {
+        vec_result.push_back(0);
+        current_index++;
+      }
+
+      int last_number_next = vec_next[current_index];
+      int last_number_prev = vec_prev[vec_prev.size() - 1];
+
+      if (prev_numbers_equal_to_next) {
+        int same_position_number_next = vec_next[vec_prev.size() - 1];
+        if ((same_position_number_next - last_number_prev) >= 1) {
+          vec_result.push_back(1);
+          return ToOrderString(vec_result);
+        } else {
+          auto vresult = GetPrevOrderFromNextOrder(
+              last_number_next, vec_result);
+          return vresult;
+        }
+      } else {
+        auto vresult = GetPrevOrderFromNextOrder(last_number_next, vec_result);
+        return vresult;
+      }
+    } else {
+      // Prev order is longer than next order
+      DCHECK(vec_prev.size() > vec_next.size());
+      return GetNextOrderFromPrevOrder(vec_prev);
+    }
+  }
+
+  return "";
 }
 
 } // namespace brave_sync
