@@ -24,9 +24,8 @@ class BravePrefProvider : public PrefProvider {
  public:
   BravePrefProvider(
       PrefService* prefs, bool incognito, bool store_last_modified);
-  ~BravePrefProvider() override {}
+  ~BravePrefProvider() override;
 
- private:
   // content_settings::PrefProvider overrides:
   void ShutdownOnUIThread() override;
   bool SetWebsiteSetting(
@@ -39,6 +38,12 @@ class BravePrefProvider : public PrefProvider {
       ContentSettingsType content_type,
       const ResourceIdentifier& resource_identifier,
       bool incognito) const override;
+
+ private:
+  std::unique_ptr<RuleIterator> GetRuleIteratorInternal(
+      ContentSettingsType content_type,
+      const ResourceIdentifier& resource_identifier,
+      bool incognito) const;
 
   // PrefProvider::pref_change_registrar_ alreay has plugin type.
   PrefChangeRegistrar brave_pref_change_registrar_;

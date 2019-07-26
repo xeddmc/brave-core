@@ -9,7 +9,7 @@
 #include "brave/common/pref_names.h"
 #include "brave/common/shield_exceptions.h"
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
-#include "brave/components/content_settings/core/browser/content_settings_util.h"
+#include "brave/components/content_settings/core/common/content_settings_util.h"
 #include "components/prefs/pref_service.h"
 #include "extensions/buildflags/buildflags.h"
 #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
@@ -47,9 +47,9 @@ bool ShouldBlockCookie(bool allow_brave_shields,
   }
 
   // If it is whitelisted, we shouldn't block
-  if (brave::IsWhitelistedCookieException(main_frame_url,
-                                          url,
-                                          allow_google_auth))
+  if (content_settings::IsWhitelistedCookieException(main_frame_url,
+                                                     url,
+                                                     allow_google_auth))
     return false;
 
   // Same TLD+1 whouldn't set the referrer
@@ -114,25 +114,32 @@ void BraveCookieSettings::GetCookieSetting(
   if (main_frame_url.is_empty())
     main_frame_url = url;
 
+  ContentSettingsForOneType shields_settings;
+  host_content_settings_map_->GetSettingsForOneType(
+      CONTENT_SETTINGS_TYPE_PLUGINS,
+      brave_shields::kBraveShields,
+      &shields_settings);
   bool allow_brave_shields =
-      IsAllowContentSetting(host_content_settings_map_.get(),
+      IsAllowContentSetting(shields_settings,
                             main_frame_url,
                             main_frame_url,
-                            CONTENT_SETTINGS_TYPE_PLUGINS,
                             brave_shields::kBraveShields);
 
+  ContentSettingsForOneType cookie_settings;
+  host_content_settings_map_->GetSettingsForOneType(
+      CONTENT_SETTINGS_TYPE_PLUGINS,
+      brave_shields::kCookies,
+      &cookie_settings);
   bool allow_1p_cookies =
-      IsAllowContentSetting(host_content_settings_map_.get(),
+      IsAllowContentSetting(cookie_settings,
                             main_frame_url,
                             GURL("https://firstParty/"),
-                            CONTENT_SETTINGS_TYPE_PLUGINS,
                             brave_shields::kCookies);
 
   bool allow_3p_cookies =
-      IsAllowContentSetting(host_content_settings_map_.get(),
+      IsAllowContentSetting(cookie_settings,
                             main_frame_url,
                             GURL(),
-                            CONTENT_SETTINGS_TYPE_PLUGINS,
                             brave_shields::kCookies);
 
   if (ShouldBlockCookie(allow_brave_shields, allow_1p_cookies, allow_3p_cookies,

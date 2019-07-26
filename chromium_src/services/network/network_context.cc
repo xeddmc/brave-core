@@ -5,7 +5,6 @@
 
 #include "services/network/network_context.h"
 
-// TODO(bridiver) - use BraveCookieSettings because we need to check firstPartyUrl
 #define BRAVE_ON_CAN_GET_COOKIES_INTERNAL \
 network_context_->cookie_manager() \
                 ->cookie_settings() \

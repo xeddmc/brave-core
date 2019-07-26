@@ -13,12 +13,11 @@
 #include "brave/components/brave_shields/browser/brave_shields_web_contents_observer.h"
 #include "brave/components/brave_shields/browser/referrer_whitelist_service.h"
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
-#include "brave/components/content_settings/core/browser/content_settings_util.h"
+#include "brave/components/content_settings/core/common/content_settings_util.h"
 #include "chrome/browser/content_settings/host_content_settings_map_factory.h"
 #include "chrome/browser/profiles/profile_io_data.h"
 #include "components/content_settings/core/browser/host_content_settings_map.h"
 #include "components/content_settings/core/common/content_settings_types.h"
-#include "components/content_settings/core/common/content_settings_utils.h"
 #include "content/public/browser/browser_task_traits.h"
 #include "content/public/browser/resource_request_info.h"
 #include "content/public/browser/websocket_handshake_request_info.h"
@@ -333,7 +332,8 @@ bool IsAllowContentSettingFromIO(const net::URLRequest* request,
       content::ResourceRequestInfo::ForRequest(request);
   if (!resource_info) {
     return content_settings::GetDefaultFromResourceIdentifier(
-        resource_identifier, primary_url, secondary_url);
+        resource_identifier, primary_url, secondary_url) ==
+            CONTENT_SETTING_ALLOW;
   }
   ProfileIOData* io_data =
       ProfileIOData::FromResourceContext(resource_info->GetContext());
@@ -348,9 +348,14 @@ bool IsAllowContentSettingsForProfile(Profile* profile,
                                       const std::string& resource_identifier) {
   DCHECK_CURRENTLY_ON(BrowserThread::UI);
   DCHECK(profile);
+  auto* map = HostContentSettingsMapFactory::GetForProfile(profile);
+  ContentSettingsForOneType settings;
+  map->GetSettingsForOneType(setting_type, resource_identifier, &settings);
   return content_settings::IsAllowContentSetting(
-      HostContentSettingsMapFactory::GetForProfile(profile), primary_url,
-      secondary_url, setting_type, resource_identifier);
+      settings,
+      primary_url,
+      secondary_url,
+      resource_identifier);
 }
 
 bool IsAllowContentSettingWithIOData(ProfileIOData* io_data,
@@ -362,9 +367,16 @@ bool IsAllowContentSettingWithIOData(ProfileIOData* io_data,
     return content_settings::GetDefaultFromResourceIdentifier(
         resource_identifier, primary_url, secondary_url);
   }
+
+  auto* map = io_data->GetHostContentSettingsMap();
+  ContentSettingsForOneType settings;
+  map->GetSettingsForOneType(setting_type, resource_identifier, &settings);
+
   return content_settings::IsAllowContentSetting(
-      io_data->GetHostContentSettingsMap(), primary_url, secondary_url,
-      setting_type, resource_identifier);
+      settings,
+      primary_url,
+      secondary_url,
+      resource_identifier);
 }
 
 void GetRenderFrameInfo(const URLRequest* request,

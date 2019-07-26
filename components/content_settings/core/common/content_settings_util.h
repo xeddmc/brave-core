@@ -8,14 +8,16 @@
 
 #include <string>
 
+#include "components/content_settings/core/common/content_settings.h"
 #include "components/content_settings/core/common/content_settings_types.h"
 #include "url/gurl.h"
 
 namespace content_settings {
 
-bool GetDefaultFromResourceIdentifier(const std::string& resource_identifier,
-                                      const GURL& primary_url,
-                                      const GURL& secondary_url);
+ContentSetting GetDefaultFromResourceIdentifier(
+    const std::string& resource_identifier,
+    const GURL& primary_url,
+    const GURL& secondary_url);
 
 bool IsWhitelistedCookieException(const GURL& primary_url,
                                   const GURL& secondary_url,

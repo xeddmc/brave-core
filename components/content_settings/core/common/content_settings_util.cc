@@ -7,6 +7,7 @@
 
 #include "brave/components/brave_shields/common/brave_shield_constants.h"
 #include "components/content_settings/core/common/content_settings_types.h"
+#include "extensions/common/url_pattern.h"
 
 namespace content_settings {
 
@@ -25,7 +26,9 @@ ContentSetting GetDefaultFromResourceIdentifier(
   } else if (resource_identifier == brave_shields::kReferrers) {
     return CONTENT_SETTING_BLOCK;
   } else if (resource_identifier == brave_shields::kCookies) {
-    return secondary_url == GURL("https://firstParty/");
+    return secondary_url == GURL("https://firstParty/")
+        ? CONTENT_SETTING_BLOCK
+        : CONTENT_SETTING_ALLOW;
   }
   return CONTENT_SETTING_BLOCK;
 }
@@ -70,9 +73,9 @@ bool IsAllowContentSetting(const ContentSettingsForOneType& content_settings,
                            const GURL& secondary_url,
                            const std::string& resource_identifier) {
   ContentSetting setting =
-      GetDefaultFromResourceIdentifier(primary_url,
-                                       secondary_url,
-                                       resource_identifier);
+      GetDefaultFromResourceIdentifier(resource_identifier,
+                                       primary_url,
+                                       secondary_url);
 
   for (const auto& entry : content_settings) {
     if (entry.primary_pattern.Matches(primary_url) &&

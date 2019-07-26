@@ -28,38 +28,9 @@ bool IsShieldsResourceID(
   }
 }
 
-class CookieRuleIterator : public RuleIterator {
- public:
-  CookieRuleIterator(ContentSetting setting) : setting_(setting) {}
-
-  bool HasNext() const override { return !is_done_; }
-
-  Rule Next() override {
-    DCHECK(HasNext());
-    is_done_ = true;
-    return Rule(ContentSettingsPattern::Wildcard(),
-                ContentSettingsPattern::Wildcard(), base::Value(setting_));
-  }
-
- private:
-  const ContentSetting setting_;
-  bool is_done_ = false;
-
-  DISALLOW_COPY_AND_ASSIGN(RuleIteratorSimple);
-};
-
 }  // namespace
 
 namespace content_settings {
-
-std::unique_ptr<RuleIterator> BraveEphemeralProvider::GetRuleIterator(
-      ContentSettingsType content_type,
-      const ResourceIdentifier& resource_identifier,
-      bool incognito) const {
-  if (content_type == CONTENT_SETTINGS_TYPE_COOKIES) {
-
-  }
-}
 
 bool BraveEphemeralProvider::SetWebsiteSetting(
     const ContentSettingsPattern& primary_pattern,
