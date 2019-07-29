@@ -1,10 +1,10 @@
-/* Copyright (c) 2019 The Brave Authors. All rights reserved.
+/* Copyright  2019 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVELEDGER_MEDIA_GITHUB_H_
-#define BRAVELEDGER_MEDIA_GITHUB_H_
+#ifndef BRAVELEDGER_MEDIA_SOUNDCLOUD_H_
+#define BRAVELEDGER_MEDIA_SOUNDCLOUD_H_
 
 #include <stdint.h>
 
@@ -13,6 +13,8 @@
 #include <string>
 
 #include "base/gtest_prod_util.h"
+#include "base/values.h"
+#include "base/optional.h"
 #include "bat/ledger/ledger.h"
 #include "bat/ledger/internal/media/helper.h"
 
@@ -22,13 +24,13 @@ class LedgerImpl;
 
 namespace braveledger_media {
 
-class GitHub : public ledger::LedgerCallbackHandler {
+class SoundCloud : public ledger::LedgerCallbackHandler {
  public:
-  explicit GitHub(bat_ledger::LedgerImpl* ledger);
+  explicit SoundCloud(bat_ledger::LedgerImpl* ledger);
 
   void ProcessActivityFromUrl(uint64_t window_id,
                               const ledger::VisitData& visit_data);
-  ~GitHub() override;
+  ~SoundCloud() override;
 
  private:
   void OnMediaPublisherActivity(
@@ -55,7 +57,7 @@ class GitHub : public ledger::LedgerCallbackHandler {
 
   void SavePublisherInfo(
       const std::string& user_id,
-      const std::string& user_name,
+      const std::string& user_url,
       const std::string& publisher_name,
       const std::string& profile_picture,
       const uint64_t window_id,
@@ -76,7 +78,11 @@ class GitHub : public ledger::LedgerCallbackHandler {
   void OnMediaActivityError(
       uint64_t window_id);
 
-  static std::string GetUserNameFromURL(const std::string& path);
+  static std::string GetUserJSON(const std::string& response);
+
+  static std::string GetUserName(const std::string& json_string);
+
+  static std::string GetBaseURL(const std::string& path);
 
   static std::string GetMediaKey(const std::string& user_name);
 
@@ -84,9 +90,7 @@ class GitHub : public ledger::LedgerCallbackHandler {
 
   static std::string GetPublisherName(const std::string& json_string);
 
-  static std::string GetProfileURL(const std::string& user_name);
-
-  static std::string GetProfileAPIURL(const std::string& user_name);
+  static std::string GetProfileURL(const std::string& user_url);
 
   static std::string GetPublisherKey(const std::string& key);
 
@@ -103,17 +107,17 @@ class GitHub : public ledger::LedgerCallbackHandler {
       int64_t* result);
 
   // For testing purposes
-  friend class MediaGitHubTest;
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetProfileURL);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetProfileAPIURL);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetProfileImageURL);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetPublisherKey);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetMediaKey);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetUserNameFromURL);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetUserId);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetPublisherName);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetJSONStringValue);
-  FRIEND_TEST_ALL_PREFIXES(MediaGitHubTest, GetJSONIntValue);
+  friend class MediaSoundCloudTest;
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetUserJSON);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetUserName);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetBaseURL);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetUserId);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetPublisherName);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetProfileURL);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetPublisherKey);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetProfileImageURL);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetJSONStringValue);
+  FRIEND_TEST_ALL_PREFIXES(MediaSoundCloudTest, GetJSONIntValue);
 
   bat_ledger::LedgerImpl* ledger_;  // NOT OWNED
 };
