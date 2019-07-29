@@ -62,6 +62,9 @@ using GetGrantCaptchaCallback = std::function<void(const std::string&,
 using RewardsInternalsInfoCallback =
     std::function<void(ledger::RewardsInternalsInfoPtr)>;
 
+using GetBalanceReportCallback =
+    std::function<void(bool, ledger::BalanceReportInfoPtr)>;
+
 class LEDGER_EXPORT Ledger {
  public:
   static bool IsMediaLink(const std::string& url,
@@ -177,9 +180,9 @@ class LEDGER_EXPORT Ledger {
 
   virtual std::string GetWalletPassphrase() const = 0;
 
-  virtual bool GetBalanceReport(ACTIVITY_MONTH month,
-                              int year,
-                              ledger::BalanceReportInfo* report_info) const = 0;
+  virtual void GetBalanceReport(ACTIVITY_MONTH month,
+      int year,
+      ledger::GetBalanceReportCallback callback) const = 0;
 
   virtual std::map<std::string, ledger::BalanceReportInfoPtr>
   GetAllBalanceReports() const = 0;
