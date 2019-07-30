@@ -64,6 +64,10 @@ TEST(BookmarkOrderUtilTest, CompareOrder) {
   EXPECT_TRUE(CompareOrder("2.0.8.10.1", "2.0.8.11.1"));
 
   EXPECT_TRUE(CompareOrder("2.0.0.1", "2.0.1"));
+
+  EXPECT_TRUE(CompareOrder("2.5.6.3", "2.5.7.8.2"));
+  EXPECT_TRUE(CompareOrder("2.5.6.3", "2.5.6.4"));
+  EXPECT_TRUE(CompareOrder("2.5.6.4", "2.5.7.8.2"));
 }
 
 TEST(BookmarkOrderUtilTest, GetOrder) {
@@ -86,6 +90,8 @@ TEST(BookmarkOrderUtilTest, GetOrder) {
 
   EXPECT_EQ(GetOrder("2.0.8.10.0.1", "2.0.8.15.1", ""), "2.0.8.10.0.2");
   EXPECT_EQ(GetOrder("", "", "2.0.9"), "2.0.9.1");
+
+  EXPECT_EQ(GetOrder("2.5.6.3", "2.5.7.8.2", ""), "2.5.6.4");
 }
 
 }   // namespace brave_sync
