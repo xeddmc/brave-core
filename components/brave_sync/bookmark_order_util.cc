@@ -152,8 +152,17 @@ std::string GetOrder(const std::string& prev, const std::string& next,
           return vresult;
         }
       } else {
-        auto vresult = GetPrevOrderFromNextOrder(last_number_next, vec_result);
-        return vresult;
+        // In the worst case at current point:
+        // prev is a.b.c.d.e
+        // next is a.b.c.x.y.z
+        // 1) At least two right digits in prev are different because
+        // prev_numbers_equal_to_next==false
+        // 2) (prev) < (next) and (1) mean
+        //     first_diff_digit_of_prev < first_diff_digit_of_next
+        // So can produce result as
+        //     a.b.c.d.e+1
+        std::vector<int> vec = OrderToIntVect(prev);
+        return GetNextOrderFromPrevOrder(vec);
       }
     } else {
       // Prev order is longer than next order
