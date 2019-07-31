@@ -46,6 +46,9 @@ declare namespace RewardsTip {
     userName: string
     postText: string
     postRelDate: string
+  } | {
+    mediaType: 'soundcloud'
+    userUrl: string
   }
 
   interface RedditMetaData {

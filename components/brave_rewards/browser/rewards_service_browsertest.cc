@@ -85,6 +85,19 @@ std::unique_ptr<net::test_server::HttpResponse> HandleRequest(
         "    </div>"
         "  </body>"
         "</html>");
+  } else if (request.relative_url == "/soundcloud") {
+    http_response->set_content(
+      "<html>"
+        "  <head></head>"
+        "  <body>"
+        "    <div class='playbackSoundBadge'>"
+        "      <a href='/testuser123' class='playbackSoundBadge__avatar'></a>"
+        "      <div class='playbackSoundBadge__actions'>"
+        "        <div>foo</div>"
+        "      </div>"
+        "    </div>"
+        "  </body>"
+        "</html>");
   } else {
     http_response->set_content(
         "<html>"
@@ -1915,6 +1928,52 @@ IN_PROC_BROWSER_TEST_F(BraveRewardsBrowserTest,
 
   // Navigate to Reddit in a new tab
   GURL url = https_server()->GetURL("brave.com", "/reddit");
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
+
+  // Ensure that Media Tips injection is not active
+  EXPECT_FALSE(IsMediaTipsInjected());
+}
+
+// Brave tip icon is injected when visiting SoundCloud
+IN_PROC_BROWSER_TEST_F(BraveRewardsBrowserTest,
+    SoundCloudTipsInjectedOnSoundCloud) {
+  // Enable Rewards
+  EnableRewards();
+
+  // Navigate to SoundCloud in a new tab
+  GURL url = https_server()->GetURL("soundcloud.com", "/soundcloud");
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
+
+  // Ensure that Media Tips injection is active
+  EXPECT_TRUE(IsMediaTipsInjected());
+}
+
+// Brave tip icon is not injected when visiting SoundCloud while Brave
+// Rewards is disabled
+IN_PROC_BROWSER_TEST_F(BraveRewardsBrowserTest,
+                       SoundCloudTipsNotInjectedWhenRewardsDisabled) {
+  // Navigate to SoundCloud in a new tab
+  GURL url = https_server()->GetURL("soundcloud.com", "/soundcloud");
+  ui_test_utils::NavigateToURLWithDisposition(
+      browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
+      ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);
+
+  // Ensure that Media Tips injection is not active
+  EXPECT_FALSE(IsMediaTipsInjected());
+}
+
+// Brave tip icon is not injected when not visiting SoundCloud
+IN_PROC_BROWSER_TEST_F(BraveRewardsBrowserTest,
+                       SoundCloudTipsNotInjectedOnNonSoundCloud) {
+  // Enable Rewards
+  EnableRewards();
+
+  // Navigate to SoundCloud in a new tab
+  GURL url = https_server()->GetURL("brave.com", "/soundcloud");
   ui_test_utils::NavigateToURLWithDisposition(
       browser(), url, WindowOpenDisposition::NEW_FOREGROUND_TAB,
       ui_test_utils::BROWSER_TEST_WAIT_FOR_NAVIGATION);

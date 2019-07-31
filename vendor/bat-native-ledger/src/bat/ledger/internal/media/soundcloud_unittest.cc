@@ -59,7 +59,7 @@ TEST(MediaSoundCloudTest, GetUserJSON) {
 
 
 TEST(MediaSoundCloudTest, GetUserName) {
-  //empty
+  // empty
   std::string user_name = SoundCloud::GetUserName("");
   ASSERT_EQ(user_name, "");
 
@@ -166,7 +166,10 @@ TEST(MediaSoundCloudTest, GetJSONStringValue) {
 
   // empty
   bool success =
-      braveledger_media::SoundCloud::GetJSONStringValue("full_name", "", &result);
+      braveledger_media::SoundCloud::GetJSONStringValue(
+        "full_name",
+        "",
+        &result);
   ASSERT_FALSE(success);
   ASSERT_TRUE(result.empty());
 

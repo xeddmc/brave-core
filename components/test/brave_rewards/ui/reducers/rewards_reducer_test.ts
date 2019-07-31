@@ -183,7 +183,8 @@ describe('rewards reducer', () => {
       const expectedState: Rewards.State = {
         inlineTip: {
           twitter: true,
-          reddit: true
+          reddit: true,
+          soundcloud: true
         }
       }
 
@@ -207,7 +208,8 @@ describe('rewards reducer', () => {
       const expectedState: Rewards.State = { ...defaultState }
       expectedState.inlineTip = {
         twitter: true,
-        reddit: true
+        reddit: true,
+        soundcloud: true
       }
 
       const assertion = reducers({
@@ -230,7 +232,8 @@ describe('rewards reducer', () => {
       const expectedState: Rewards.State = { ...defaultState }
       expectedState.inlineTip = {
         twitter: true,
-        reddit: true
+        reddit: true,
+        soundcloud: true
       }
 
       const assertion = reducers({
@@ -253,7 +256,8 @@ describe('rewards reducer', () => {
       const expectedState: Rewards.State = { ...defaultState }
       expectedState.inlineTip = {
         twitter: false,
-        reddit: true
+        reddit: true,
+        soundcloud: true
       }
 
       const assertion = reducers({
@@ -276,7 +280,8 @@ describe('rewards reducer', () => {
       const expectedState: Rewards.State = { ...defaultState }
       expectedState.inlineTip = {
         twitter: false,
-        reddit: false
+        reddit: false,
+        soundcloud: true
       }
 
       const assertion = reducers({
@@ -285,6 +290,30 @@ describe('rewards reducer', () => {
         type: types.ON_INLINE_TIP_SETTINGS_CHANGE,
         payload: {
           key: 'reddit',
+          value: false
+        }
+      })
+      expect(assertion).toEqual({
+        rewardsData: expectedState
+      })
+    })
+
+    it('all ok for soundcloud', () => {
+      const initState: Rewards.State = { ...defaultState }
+
+      const expectedState: Rewards.State = { ...defaultState }
+      expectedState.inlineTip = {
+        twitter: false,
+        reddit: false,
+        soundcloud: false
+      }
+
+      const assertion = reducers({
+        rewardsData: initState
+      }, {
+        type: types.ON_INLINE_TIP_SETTINGS_CHANGE,
+        payload: {
+          key: 'soundcloud',
           value: false
         }
       })

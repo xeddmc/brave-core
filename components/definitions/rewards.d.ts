@@ -48,6 +48,7 @@ declare namespace Rewards {
     inlineTip: {
       twitter: boolean
       reddit: boolean
+      soundcloud: boolean
     }
     excludedList: ExcludedPublisher[]
     firstLoad: boolean | null
