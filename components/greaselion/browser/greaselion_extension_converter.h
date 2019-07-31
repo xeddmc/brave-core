@@ -33,7 +33,7 @@ class GreaselionRule;
 // returned object.
 scoped_refptr<extensions::Extension>
 ConvertGreaselionRuleToExtensionOnTaskRunner(
-    const GreaselionRule& rule,
+    GreaselionRule* rule,
     const base::FilePath& extensions_dir);
 
 }  // namespace greaselion

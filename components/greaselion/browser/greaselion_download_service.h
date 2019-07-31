@@ -85,12 +85,23 @@ class GreaselionDownloadService : public LocalDataFilesObserver {
                         const base::FilePath& install_dir,
                         const std::string& manifest) override;
 
+  // implementation of our own observers
+  class Observer : public base::CheckedObserver {
+   public:
+    virtual void OnRulesReady(GreaselionDownloadService* download_service) = 0;
+  };
+  void AddObserver(Observer* observer) { observers_.AddObserver(observer); }
+  void RemoveObserver(Observer* observer) {
+    observers_.RemoveObserver(observer);
+  }
+
  private:
   friend class ::GreaselionServiceTest;
 
   void OnDATFileDataReady(std::string contents);
   void LoadOnTaskRunner();
 
+  base::ObserverList<Observer> observers_;
   std::vector<std::unique_ptr<GreaselionRule>> rules_;
   base::FilePath install_dir_;
 

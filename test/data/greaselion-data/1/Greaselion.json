@@ -9,7 +9,7 @@
     },
     {
         "urls": [
-            "https://www.example.*/*"
+            "https://*/*"
         ],
         "scripts": [
             "scripts/example-star.js"
@@ -17,7 +17,9 @@
     },
     {
         "urls": [
-            "http://www.a.com:*/*"
+            "http://www.a.com:*/*",
+            "http://*/*",
+            "https://*/*"
         ],
         "scripts": [
             "scripts/a-com.js"

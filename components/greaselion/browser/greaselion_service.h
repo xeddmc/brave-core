@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "base/macros.h"
+#include "base/observer_list.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "url/gurl.h"
 
@@ -30,6 +31,16 @@ class GreaselionService : public KeyedService {
   GreaselionService() = default;
 
   virtual void SetFeatureEnabled(GreaselionFeature feature, bool enabled) = 0;
+  virtual void UpdateInstalledExtensions() = 0;
+
+  // implementation of our own observers
+  class Observer : public base::CheckedObserver {
+   public:
+    virtual void OnExtensionsReady(GreaselionService* greaselion_service,
+                                   bool success) = 0;
+  };
+  virtual void AddObserver(Observer* observer) = 0;
+  virtual void RemoveObserver(Observer* observer) = 0;
 
  private:
   DISALLOW_COPY_AND_ASSIGN(GreaselionService);

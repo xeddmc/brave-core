@@ -36,7 +36,7 @@ using extensions::Manifest;
 namespace greaselion {
 
 scoped_refptr<Extension> ConvertGreaselionRuleToExtensionOnTaskRunner(
-    const GreaselionRule& rule,
+    GreaselionRule* rule,
     const base::FilePath& extensions_dir) {
   base::FilePath install_temp_dir =
       extensions::file_util::GetInstallTempDir(extensions_dir);
@@ -54,37 +54,42 @@ scoped_refptr<Extension> ConvertGreaselionRuleToExtensionOnTaskRunner(
   // Create the manifest
   std::unique_ptr<base::DictionaryValue> root(new base::DictionaryValue);
 
+  // manifest version is always 2
+  // see kModernManifestVersion in src/extensions/common/extension.cc
+  root->SetIntPath(extensions::manifest_keys::kManifestVersion, 2);
+
   // Create the public key.
   // Greaselion scripts are not signed, but the public key for an extension
   // doubles as its unique identity, and we need one of those, so we add the
-  // rule name to a known Brave domain and hash the result to create a public
-  // key.
+  // rule name to a known Brave domain and hash the result to create a
+  // public key.
   char raw[crypto::kSHA256Length] = {0};
   std::string key;
-  std::string script_name = rule.name();
+  std::string script_name = rule->name();
   crypto::SHA256HashString(kBraveUpdatesExtensionsEndpoint + script_name, raw,
                            crypto::kSHA256Length);
   base::Base64Encode(base::StringPiece(raw, crypto::kSHA256Length), &key);
 
-  root->SetString(extensions::manifest_keys::kName, script_name);
-  root->SetString(extensions::manifest_keys::kVersion, "1.0");
-  root->SetString(extensions::manifest_keys::kDescription, "");
-  root->SetString(extensions::manifest_keys::kPublicKey, key);
+  root->SetStringPath(extensions::manifest_keys::kName, script_name);
+  root->SetStringPath(extensions::manifest_keys::kVersion, "1.0");
+  root->SetStringPath(extensions::manifest_keys::kDescription, "");
+  root->SetStringPath(extensions::manifest_keys::kPublicKey, key);
 
   auto js_files = std::make_unique<base::ListValue>();
-  for (auto script : rule.scripts())
+  for (auto script : rule->scripts())
     js_files->AppendString(script.BaseName().value());
 
   auto matches = std::make_unique<base::ListValue>();
-  for (auto url_pattern : rule.url_patterns())
+  for (auto url_pattern : rule->url_patterns())
     matches->AppendString(url_pattern);
 
   auto content_script = std::make_unique<base::DictionaryValue>();
   content_script->Set(extensions::manifest_keys::kMatches, std::move(matches));
   content_script->Set(extensions::manifest_keys::kJs, std::move(js_files));
   // All Greaselion scripts run at document start.
-  content_script->SetString(extensions::manifest_keys::kRunAt,
-                            extensions::manifest_values::kRunAtDocumentStart);
+  content_script->SetStringPath(
+      extensions::manifest_keys::kRunAt,
+      extensions::manifest_values::kRunAtDocumentStart);
 
   auto content_scripts = std::make_unique<base::ListValue>();
   content_scripts->Append(std::move(content_script));
@@ -101,7 +106,7 @@ scoped_refptr<Extension> ConvertGreaselionRuleToExtensionOnTaskRunner(
   }
 
   // Copy the script files to our extension directory.
-  for (auto script : rule.scripts()) {
+  for (auto script : rule->scripts()) {
     if (!base::CopyFile(script, temp_dir.GetPath().Append(script.BaseName()))) {
       LOG(ERROR) << "Could not copy Greaselion script";
       return NULL;
@@ -114,9 +119,12 @@ scoped_refptr<Extension> ConvertGreaselionRuleToExtensionOnTaskRunner(
                         Extension::NO_FLAGS, &error);
   if (!extension.get()) {
     LOG(ERROR) << "Could not create Greaselion extension";
+    LOG(ERROR) << error;
     return NULL;
   }
 
+  LOG(INFO) << "Unpacked extension temporarily installed in "
+            << temp_dir.GetPath();
   temp_dir.Take();  // The caller takes ownership of the directory.
   return extension;
 }

@@ -128,6 +128,7 @@ void BraveBrowserProcessImpl::ResourceDispatcherHostCreated() {
 #endif
   referrer_whitelist_service();
   tracking_protection_service();
+  greaselion_download_service();
   // Now start the local data files service, which calls all observers.
   local_data_files_service()->Start();
 }

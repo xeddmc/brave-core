@@ -148,6 +148,10 @@ void GreaselionDownloadService::OnDATFileDataReady(std::string contents) {
     rule->Parse(preconditions_value, urls_value, scripts_value, install_dir_);
     rules_.push_back(std::move(rule));
   }
+  LOG(INFO) << "parsed " << rules_.size()
+            << " Greaselion rules, firing OnRulesReady";
+  for (Observer& observer : observers_)
+    observer.OnRulesReady(this);
 }
 
 void GreaselionDownloadService::OnComponentReady(

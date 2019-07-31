@@ -38,17 +38,23 @@ class GreaselionServiceImpl : public GreaselionService {
 
   // GreaselionService overrides
   void SetFeatureEnabled(GreaselionFeature feature, bool enabled) override;
+  void UpdateInstalledExtensions() override;
+  void AddObserver(Observer* observer) override;
+  void RemoveObserver(Observer* observer) override;
 
  private:
-  void UpdateInstalledExtensions();
   void Install(scoped_refptr<extensions::Extension> extension);
   void PostInstall(const base::FilePath& extension_path);
+  void MaybeNotifyObservers();
 
   GreaselionDownloadService* download_service_;  // NOT OWNED
   GreaselionFeatures state_;
   const base::FilePath install_directory_;
   bool all_rules_installed_successfully_;
+  int pending_installs_;
   scoped_refptr<base::SequencedTaskRunner> task_runner_;
+  base::ObserverList<Observer> observers_;
+  std::map<std::string, base::FilePath> installed_;
   base::WeakPtrFactory<GreaselionServiceImpl> weak_factory_;
 
   DISALLOW_COPY_AND_ASSIGN(GreaselionServiceImpl);
