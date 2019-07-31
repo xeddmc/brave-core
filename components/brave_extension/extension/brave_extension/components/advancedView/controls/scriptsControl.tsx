@@ -159,6 +159,7 @@ export default class ScriptsControls extends React.PureComponent<Props, State> {
                 <LinkAction
                   size='small'
                   onClick={this.onClickAllowScriptsOnce}
+                  style={{ zIndex: 1 }}
                 >
                   {getLocale('allowScriptsOnce')}
                 </LinkAction>
