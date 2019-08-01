@@ -60,7 +60,7 @@ export default function cosmeticFilterReducer (state: State = {
         state = shieldsPanelState.resetBlockingResources(state, action.tabId)
         state = noScriptState.resetNoScriptInfo(state, action.tabId, getOrigin(action.url))
       }
-      applySiteFilters(tabData.hostname)
+      applySiteFilters(action.tabId, tabData.hostname)
       break
     }
     case windowTypes.WINDOW_REMOVED: {

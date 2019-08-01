@@ -18,7 +18,7 @@ export const removeSiteFilter = (origin: string) => {
   })
 }
 
-export const applySiteFilters = (hostname: string) => {
+export const applySiteFilters = (tabId: number, hostname: string) => {
   chrome.storage.local.get('cosmeticFilterList', (storeData = {}) => {
     if (!storeData.cosmeticFilterList) {
       if (process.env.NODE_ENV === 'shields_development') {
@@ -27,11 +27,11 @@ export const applySiteFilters = (hostname: string) => {
       return
     }
     if (storeData.cosmeticFilterList[hostname] !== undefined) {
-      storeData.cosmeticFilterList[hostname].map((rule: string) => {
+      storeData.cosmeticFilterList[hostname].map((tabId: number, rule: string) => {
         if (process.env.NODE_ENV === 'shields_development') {
           console.log('applying rule', rule)
         }
-        chrome.tabs.insertCSS({ // https://github.com/brave/brave-browser/wiki/Cosmetic-Filtering
+        chrome.tabs.insertCSS(tabId, { // https://github.com/brave/brave-browser/wiki/Cosmetic-Filtering
           code: `${rule} {display: none !important;}`,
           cssOrigin: 'user',
           runAt: 'document_start'
